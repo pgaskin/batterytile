@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <group
+        android:scaleX="0.50"
+        android:scaleY="0.50"
+        android:translateX="240"
+        android:translateY="720">
+        <path
+            android:fillColor="#a8f5a6"
+            android:pathData="M320-80q-17 0-28.5-11.5T280-120v-640q0-17 11.5-28.5T320-800h80v-40q0-17 11.5-28.5T440-880h80q17 0 28.5 11.5T560-840v40h80q17 0 28.5 11.5T680-760v640q0 17-11.5 28.5T640-80H320Zm40-480h240v-160H360v160Z"
+            tools:ignore="VectorPath" />
+        <!-- Material Symbols Rounded (battery_5_bar FILL:0 wght:400 GRAD:0 opsz:24) -->
+    </group>
+</vector>
