@@ -7,4 +7,4 @@
 - Works on Android 12+.
 - Toggle between current, temperature, time, and status.
 
-[**`Download Latest Build`**](https://nightly.link/pgaskin/batterytile/workflows/ci/master/app-debug)
+[**`Download`**](https://github.com/pgaskin/batterytile/releases/latest)
