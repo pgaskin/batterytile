@@ -17,7 +17,7 @@ import java.lang.reflect.Field;
 import java.util.Objects;
 
 public class BatteryTileService extends TileService {
-    private final int UPDATE_INTERVAL = 15000;
+    private final int UPDATE_INTERVAL = 10000;
     private final String DISPLAY_STATE_PREF = "display_state";
     private final int DISPLAY_STATE_CURRENT = 0;
     private final int DISPLAY_STATE_TEMP = 1;
