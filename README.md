@@ -8,3 +8,10 @@
 - Toggle between current, temperature, time, and status.
 
 [**`Download`**](https://github.com/pgaskin/batterytile/releases/latest)
+
+<table><tbody><tr>
+<td><img src="app/screenshot/0.png"></td>
+<td><img src="app/screenshot/1.png"></td>
+<td><img src="app/screenshot/2.png"></td>
+<td><img src="app/screenshot/3.png"></td>
+</tr></tbody></table>
