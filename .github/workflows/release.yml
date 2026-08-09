@@ -58,6 +58,22 @@ jobs:
       - name: Verify APK signature
         run: $ANDROID_HOME/build-tools/36.0.0/apksigner verify --print-certs app-release.apk
 
+      - name: Verify reproducible build
+        # based on what claude did for cmus-android
+        run: |
+          set -euo pipefail
+          rebuild=/tmp/batterytile-rebuild-at-a-different-path
+          rsync -a --delete \
+            --exclude='/build/' --exclude='/app/build/' \
+            --exclude='.gradle/' --exclude='.cxx/' \
+            ./ "$rebuild/"
+          ( cd "$rebuild" && ./gradlew --no-daemon app:assembleRelease )
+          unsigned=app/build/outputs/apk/release/app-release-unsigned.apk
+          rebuilt="$rebuild/app/build/outputs/apk/release/app-release-unsigned.apk"
+          curl -sLo /tmp/check-reproducible.go https://github.com/pgaskin/cmus-android/raw/4bd7e4dda221961e14c215c9e415a43f47215702/notes/check-reproducible.go
+          go run /tmp/check-reproducible.go "$unsigned" "$rebuilt"
+          go run /tmp/check-reproducible.go app-release.apk "$rebuilt"
+
       - name: Create release
         id: create-release
         uses: actions/github-script@v8
