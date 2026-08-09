@@ -32,6 +32,7 @@ jobs:
             if (versionName !== versionCode) throw new Error(`versionName (${versionName}) does not match versionCode (${versionCode})`)
             if (tag !== `v${versionName}`) throw new Error(`tag (${tag}) does not match versionName (${versionName})`)
             if (tag !== `v${versionCode}`) throw new Error(`tag (${tag}) does not match versionCode (${versionCode})`)
+            if (!fs.existsSync(`metadata/en-US/changelogs/${versionCode}.txt`)) throw new Error(`missing changelog for versionCode ${versionCode}`)
             core.setOutput('name', versionName)
             core.setOutput('code', versionCode)
             core.setOutput('tag', tag)

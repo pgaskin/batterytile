@@ -9,9 +9,4 @@
 
 [**`Download`**](https://github.com/pgaskin/batterytile/releases/latest)
 
-<table><tbody><tr>
-<td><img src="app/screenshot/0.png"></td>
-<td><img src="app/screenshot/1.png"></td>
-<td><img src="app/screenshot/2.png"></td>
-<td><img src="app/screenshot/3.png"></td>
-</tr></tbody></table>
+![](metadata/en-US/images/phoneScreenshots/1.png)

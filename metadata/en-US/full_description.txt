@@ -1,0 +1,7 @@
+Quick Settings tile showing battery current/temperature/time/status.
+
+This app has no launcher icon. It must be added in the Quick Settings panel.
+
+Tap to switch the view. Long-press to open the battery settings page.
+
+Not all devices will support all types of information.
