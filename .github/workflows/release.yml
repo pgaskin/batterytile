@@ -51,7 +51,7 @@ jobs:
           KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
       - name: Sign APK
-        run: $ANDROID_HOME/build-tools/36.0.0/apksigner sign --ks "$KEYSTORE_PATH" --ks-pass env:KEYSTORE_PASSWORD --in app/build/outputs/apk/release/app-release-unsigned.apk --out app-release.apk
+        run: $ANDROID_HOME/build-tools/36.0.0/apksigner sign --v1-signing-enabled false --alignment-preserved --ks "$KEYSTORE_PATH" --ks-pass env:KEYSTORE_PASSWORD --in app/build/outputs/apk/release/app-release-unsigned.apk --out app-release.apk
         env:
           KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -80,12 +80,15 @@ jobs:
         with:
           retries: 3
           script: |
+            const tag = ${{ toJSON(steps.version.outputs.tag) }}
+            const versionCode = ${{ toJSON(steps.version.outputs.code) }}
             const {data: {id: id}} = await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: context.ref.replace(/^refs\/tags\//, ''),
+              tag_name: tag,
               target_commitish: context.sha,
-              name: context.ref.replace(/^refs\/tags\//, ''),
+              name: tag,
+              body: require('fs').readFileSync(`metadata/en-US/changelogs/${versionCode}.txt`, 'utf8'),
               draft: true,
             })
             core.setOutput('id', id)
