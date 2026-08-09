@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2023-2026 Patrick Gaskin
+// SPDX-License-Identifier: MIT
 package net.pgaskin.batterytile;
 
 import android.annotation.SuppressLint;
