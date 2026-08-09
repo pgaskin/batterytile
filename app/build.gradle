@@ -18,6 +18,8 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+            // ensure the git state doesn't affect the build reproducibility
+            vcsInfo.include = false
         }
     }
 
@@ -30,6 +32,14 @@ android {
         main {
             jniLibs.srcDirs = ['libs']
         }
+    }
+}
+
+// pin the toolchain for reproducible builds (and match f-droid and github
+// actions)
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 

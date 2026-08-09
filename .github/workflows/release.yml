@@ -5,69 +5,82 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
-  app:
-    name: App
+  release:
+    environment:
+      name: release
+      deployment: false
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v7
+
+      - name: Check version
+        id: version
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs')
+            const gradle = fs.readFileSync('app/build.gradle', 'utf8')
+            const versionName = gradle.match(/^\s*versionName\s+'([^']+)'/m)?.[1]
+            const versionCode = gradle.match(/^\s*versionCode\s+([0-9]+)/m)?.[1]
+            if (!versionName) throw new Error('missing versionName in app/build.gradle')
+            if (!versionCode) throw new Error('missing versionCode in app/build.gradle')
+            const tag = context.ref.replace(/^refs\/tags\//, '')
+            if (versionName !== versionCode) throw new Error(`versionName (${versionName}) does not match versionCode (${versionCode})`)
+            if (tag !== `v${versionName}`) throw new Error(`tag (${tag}) does not match versionName (${versionName})`)
+            if (tag !== `v${versionCode}`) throw new Error(`tag (${tag}) does not match versionCode (${versionCode})`)
+            core.setOutput('name', versionName)
+            core.setOutput('code', versionCode)
+            core.setOutput('tag', tag)
+
+      - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
           cache: gradle
+      - run: yes | ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --licenses; ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager 'build-tools;36.0.0'
       - run: ./gradlew app:assembleRelease
-      - uses: actions/upload-artifact@v3
-        with:
-          name: app-release
-          path: app/build/outputs/apk/release/app-release-unsigned.apk
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    environment: release
-    permissions:
-      contents: write
-    needs:
-      - app
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: app-release
+
       - name: Write keystore
         run: echo "$KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_PATH"
         env:
           KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
       - name: Sign APK
-        run: $ANDROID_HOME/build-tools/33.0.0/apksigner sign --ks "$KEYSTORE_PATH" --ks-pass env:KEYSTORE_PASSWORD --in app-release-unsigned.apk --out app-release.apk
+        run: $ANDROID_HOME/build-tools/36.0.0/apksigner sign --ks "$KEYSTORE_PATH" --ks-pass env:KEYSTORE_PASSWORD --in app/build/outputs/apk/release/app-release-unsigned.apk --out app-release.apk
         env:
           KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
       - name: Verify APK signature
-        run: $ANDROID_HOME/build-tools/33.0.0/apksigner verify --print-certs app-release.apk
+        run: $ANDROID_HOME/build-tools/36.0.0/apksigner verify --print-certs app-release.apk
+
       - name: Create release
-        uses: actions/github-script@v6
         id: create-release
+        uses: actions/github-script@v8
         with:
           retries: 3
-          result-encoding: string
           script: |
-            const release = await github.rest.repos.createRelease({
+            const {data: {id: id}} = await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: context.ref.split('/').pop(),
+              tag_name: context.ref.replace(/^refs\/tags\//, ''),
+              target_commitish: context.sha,
+              name: context.ref.replace(/^refs\/tags\//, ''),
               draft: true,
             })
-            return release.data.id
+            core.setOutput('id', id)
       - name: Upload release asset
-        uses: actions/github-script@v6
+        uses: actions/github-script@v9
         with:
           retries: 3
           script: |
             await github.rest.repos.uploadReleaseAsset({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              release_id: ${{ toJSON(steps.create-release.outputs.result) }},
+              release_id: ${{ toJSON(steps.create-release.outputs.id) }},
               data: require('fs').readFileSync('app-release.apk'),
               name: 'BatteryTile.apk',
             })
