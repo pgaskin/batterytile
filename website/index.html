@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Battery Tile</title>
+  <link rel="icon" href="icon.png">
+  <meta name="theme-color" content="#081109">
+  <meta name="author" content="Patrick Gaskin">
+  <meta name="description" content="Android Quick Settings tile showing the battery current, temperature, time remaining, and status.">
+  <meta property="og:description" content="Android Quick Settings tile showing the battery current, temperature, time remaining, and status.">
+  <meta property="og:title" content="Battery Tile">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://pgaskin.net/batterytile/">
+  <style>
+    /* the green colors match the app icon */
+    @font-face {
+      font-family: "Roboto";
+      src: url("roboto.woff2") format("woff2");
+      font-weight: 400 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    :root {
+      color-scheme: dark;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: #081109;
+      color: #e0e7e0;
+      font-family: "Roboto", system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      font-size: 1.0625rem;
+      line-height: 1.6;
+      font-synthesis: none;
+      -webkit-font-smoothing: antialiased;
+    }
+    a {
+      color: #a8f5a6;
+      text-decoration: none;
+    }
+    a:hover {
+      color: #e0e7e0;
+      text-decoration: underline;
+    }
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+    h1 {
+      line-height: 1.1;
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: #a8f5a6;
+    }
+    .wrap {
+      width: 100%;
+      max-width: 72rem;
+      margin-inline: auto;
+      padding-inline: clamp(1.25rem, 5vw, 2.5rem);
+    }
+    main {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      padding-block: clamp(1.5rem, 5vh, 4.5rem) clamp(1rem, 3vh, 3rem);
+    }
+    .split {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: clamp(1.5rem, 4vh, 3rem) clamp(2rem, 5vw, 4rem);
+    }
+    .hero {
+      flex: 1 1 24rem;
+    }
+    .tagline {
+      margin: clamp(.875rem, 2.5vh, 1.25rem) 0 0;
+      max-width: 40ch;
+      font-size: clamp(1rem, 2vw, 1.1875rem);
+      text-wrap: pretty;
+    }
+    .note {
+      margin: .75rem 0 0;
+      max-width: 44ch;
+      color: #a6b6a8;
+      font-size: .9375rem;
+      line-height: 1.55;
+      text-wrap: pretty;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      margin-top: clamp(1.25rem, 3.5vh, 2rem);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .5em;
+      padding: .8em 1.75em;
+      border: 1px solid transparent;
+      /* like the tiles in the screenshot */
+      border-radius: 1.0625rem;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: background-color .12s ease, border-color .12s ease, color .12s ease;
+    }
+    .btn:hover {
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: #a8f5a6;
+      color: #002105;
+    }
+    .btn-primary:hover {
+      background: #c4ffc2;
+      color: #002105;
+    }
+    .btn-ghost {
+      border-color: #55685a;
+      color: #e0e7e0;
+      background: rgba(30, 44, 32, .4);
+    }
+    .btn-ghost:hover {
+      background: #1e2c20;
+      border-color: #a6b6a8;
+      color: #e0e7e0;
+    }
+    .hero-meta {
+      margin: clamp(1rem, 2.5vh, 1.5rem) 0 0;
+      font-size: .875rem;
+      color: #a6b6a8;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem 1.25rem;
+    }
+    .hero-meta span {
+      white-space: nowrap;
+    }
+    .shot {
+      flex: 1 1 22rem;
+      margin: 0;
+      min-width: 0;
+    }
+    .shot img {
+      width: auto;
+      max-width: 100%;
+      max-height: min(45vh, 22rem);
+      border: 1px solid #26362a;
+      background: #000;
+    }
+    footer {
+      flex: 0 0 auto;
+      padding-block: clamp(1rem, 3vh, 1.5rem) clamp(1.25rem, 3vh, 1.875rem);
+      color: #a6b6a8;
+      font-size: .875rem;
+    }
+    footer .wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .875rem 1.75rem;
+      align-items: center;
+    }
+    footer nav {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem 1.375rem;
+    }
+    footer nav a {
+      color: #a6b6a8;
+    }
+    footer nav a:hover {
+      color: #e0e7e0;
+    }
+    @media (max-height: 44rem) {
+      main {
+        padding-block: 1rem .75rem;
+      }
+      .split {
+        gap: 1.25rem clamp(2rem, 5vw, 4rem);
+      }
+      .note {
+        font-size: .875rem;
+      }
+      footer {
+        padding-block: .875rem 1rem;
+      }
+    }
+    @media (max-width: 43.75rem) {
+      footer .wrap {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        gap: .75rem;
+      }
+      footer nav {
+        margin-left: 0;
+        justify-content: center;
+        gap: .5rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="wrap split">
+      <div class="hero">
+        <h1>Battery Tile</h1>
+        <p class="tagline">
+          Android Quick Settings tile showing the battery current,
+          temperature, time remaining, and status.
+        </p>
+        <p class="note">
+          There is no launcher icon; add the tile from the Quick Settings
+          panel. Tap it to switch the view, long-press it to open the battery
+          settings.
+        </p>
+        <div class="actions">
+          <a class="btn btn-primary"
+            href="https://github.com/pgaskin/batterytile/releases/latest/download/BatteryTile.apk">Download</a>
+          <a class="btn btn-ghost" href="https://github.com/pgaskin/batterytile">Source code</a>
+        </div>
+        <p class="hero-meta">
+          <!-- VERSION -->
+          <span>Android 12+</span>
+          <span>MIT</span>
+        </p>
+      </div>
+      <figure class="shot">
+        <img src="shot.png" alt="Four Quick Settings tiles labelled Battery, showing -148 mA, 27.6&deg;C, 1d 4h 26m, and DIS 50%" width="702" height="420">
+      </figure>
+    </div>
+  </main>
+  <footer>
+    <div class="wrap">
+      <span>&copy; 2023-2026 Patrick Gaskin</span>
+      <nav>
+        <a href="https://github.com/pgaskin/batterytile">Source</a>
+        <a href="https://github.com/pgaskin/batterytile/releases">Releases</a>
+        <a href="https://github.com/pgaskin/batterytile/issues">Issues</a>
+        <a href="https://pgaskin.net">pgaskin.net</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
